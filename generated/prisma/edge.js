@@ -144,7 +144,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/user/dck-cash-mgmt-be/generated/prisma",
+      "value": "D:\\Cash Management\\cash-mgmt-be\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -153,12 +153,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "debian-openssl-1.1.x",
+        "value": "windows",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/user/dck-cash-mgmt-be/prisma/schema.prisma",
+    "sourceFilePath": "D:\\Cash Management\\cash-mgmt-be\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -172,6 +172,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

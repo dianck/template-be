@@ -1,6 +1,9 @@
 import cors from "cors";
 import express, { Application, Request, Response } from 'express';
-import { UserRouter } from "./routers/user.router";
+import AuthRouter from "./routers/auth.router";
+// import { AuthRouter } from "./routers/auth.router";
+
+
 
 
 const PORT: number = 8000;
@@ -16,8 +19,8 @@ app.get('/api', (req: Request, res: Response) => {
 });
 
 // Perbaikan: Hindari nama variabel yang sama dengan class
-const userRouter = new UserRouter();
-app.use("/api/user", userRouter.getRouter());
+const authRouter = new AuthRouter();
+app.use("/api/auth", authRouter.getRouter());
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
