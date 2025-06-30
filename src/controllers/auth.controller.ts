@@ -109,7 +109,7 @@ curl -X POST http://localhost:8000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "dianck",
-    "email": "dianck2002@gmail.com",
+    "email": "cafofy@forexzig.com",
     "password": "asd123"
   }'
 
