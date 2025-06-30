@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const __prisma_1 = __importDefault(require("../..prisma"));
+const prisma_1 = __importDefault(require("../prisma"));
 const bcrypt_1 = require("bcrypt");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const handlebars_1 = __importDefault(require("handlebars"));
@@ -26,7 +26,7 @@ class AuthController {
                 return;
             }
             logDebug("FIELD CHECK OK...");
-            const existingUser = await __prisma_1.default.user.findUnique({ where: { email } });
+            const existingUser = await prisma_1.default.user.findUnique({ where: { email } });
             if (existingUser) {
                 res.status(409).send({ message: "Email already registered" });
                 return;
@@ -35,7 +35,7 @@ class AuthController {
             logDebug("Registering user...");
             const salt = await (0, bcrypt_1.genSalt)(10);
             const hashedPassword = await (0, bcrypt_1.hash)(password, salt);
-            const user = await __prisma_1.default.user.create({
+            const user = await prisma_1.default.user.create({
                 data: {
                     username,
                     email,
@@ -48,7 +48,7 @@ class AuthController {
             const token = (0, jsonwebtoken_1.sign)(payload, process.env.SECRET_KEY_VERIFY, { expiresIn: "10m" });
             logDebug("TOKEN Generated OK...");
             const expiredAt = new Date(Date.now() + 10 * 60 * 1000);
-            await __prisma_1.default.email_verifications.create({
+            await prisma_1.default.email_verifications.create({
                 data: { userId: user.id, token, expiredAt },
             });
             logDebug("Email VErification insertion OK...");
