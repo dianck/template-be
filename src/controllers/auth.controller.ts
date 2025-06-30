@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../../prisma";
+import prisma from "../prisma";
 import { genSalt, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import Handlebars from "handlebars";
