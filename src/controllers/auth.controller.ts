@@ -16,8 +16,6 @@ function logDebug(message: string, ...optionalParams: any[]) {
 
 export default class AuthController{
 
-
-
     async register(req: Request, res: Response) {
         try {
 
@@ -105,13 +103,8 @@ export default class AuthController{
 
 /*
 
-curl -X POST http://localhost:8000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "dianck",
-    "email": "cafofy@forexzig.com",
-    "password": "asd123"
-  }'
+curl http://localhost:8000/api/test-prisma
+
 
 
 */
