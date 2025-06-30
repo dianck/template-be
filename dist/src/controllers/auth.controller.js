@@ -10,7 +10,7 @@ const handlebars_1 = __importDefault(require("handlebars"));
 const mailer_1 = require("../helpers/mailer");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const isDebug = process.env.DEBUG === "false";
+const isDebug = process.env.DEBUG === "true";
 function logDebug(message, ...optionalParams) {
     if (isDebug) {
         console.log("[DEBUG]", message, ...optionalParams);
