@@ -155,6 +155,10 @@ const config = {
         "fromEnvVar": null,
         "value": "debian-openssl-1.1.x",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -181,8 +185,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\nmodel User {\n  id         Int      @id @default(autoincrement())\n  username   String   @unique @db.VarChar(100)\n  email      String   @unique\n  password   String\n  avatar     String?\n  user_code  Int      @default(0)\n  user_level Int      @default(1)\n  isVerified Boolean  @default(false)\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n}\n\nmodel email_verifications {\n  id        Int      @id @default(autoincrement())\n  userId    Int\n  token     String\n  createdAt DateTime @default(now())\n  expiredAt DateTime\n}\n",
-  "inlineSchemaHash": "ef6e78e8224fe60c3aecd89a84464a8c3e2e40026d2061af154265075a57fb49",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\nmodel User {\n  id         Int      @id @default(autoincrement())\n  username   String   @unique @db.VarChar(100)\n  email      String   @unique\n  password   String\n  avatar     String?\n  user_code  Int      @default(0)\n  user_level Int      @default(1)\n  isVerified Boolean  @default(false)\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n}\n\nmodel email_verifications {\n  id        Int      @id @default(autoincrement())\n  userId    Int\n  token     String\n  createdAt DateTime @default(now())\n  expiredAt DateTime\n}\n",
+  "inlineSchemaHash": "1e4980ab8182e7c7e596065583debd79a9817ab893100d70f34dcb8496cad67e",
   "copyEngine": true
 }
 config.dirname = '/'
