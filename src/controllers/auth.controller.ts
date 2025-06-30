@@ -7,7 +7,7 @@ import { transporter } from "../helpers/mailer";
 import fs from "fs";
 import path from "path";
 
-const isDebug = process.env.DEBUG === "true";
+const isDebug = process.env.DEBUG === "false";
 function logDebug(message: string, ...optionalParams: any[]) {
   if (isDebug) {
     console.log("[DEBUG]", message, ...optionalParams);
