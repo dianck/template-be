@@ -103,8 +103,15 @@ export default class AuthController{
 
 /*
 
-curl http://localhost:8000/api/test-prisma
+curl http://localhost:8000/api
 
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "dianck",
+    "email": "cafofy@forexzig.com",
+    "password": "asd123"
+  }'
 
 
 */
