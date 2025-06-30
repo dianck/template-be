@@ -29,6 +29,6 @@ const testPrismaConnection = async (req, res) => {
 exports.testPrismaConnection = testPrismaConnection;
 /**
  
-curl -X POST http://localhost:8000/api/auth/register \
+curl -X GET http://localhost:8000/api/test-prisma
  
  */ 

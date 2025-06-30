@@ -30,6 +30,6 @@ export const testPrismaConnection = async (req: Request, res: Response) => {
 
 /**
  
-curl -X POST http://localhost:8000/api/auth/register \
+curl -X GET http://localhost:8000/api/test-prisma
  
  */
