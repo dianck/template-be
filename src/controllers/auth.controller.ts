@@ -136,6 +136,8 @@ export default class AuthController{
 
 /*
 
+curl -X GET http://localhost:8000/api
+
 curl -X POST http://localhost:8000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
@@ -145,4 +147,8 @@ curl -X POST http://localhost:8000/api/auth/register \
   }'
 
 
+curl -X PATCH http://localhost:8000/api/auth/verify   
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDgsImlhdCI6MTc1MTQ0MDE4NiwiZXhwIjoxNzUxNDQwNzg2fQ.J3O8jzo0p8oCp_zDEFcUj6OuU1zPuxHMD8pj7cKerKA"
+  
+  
 */

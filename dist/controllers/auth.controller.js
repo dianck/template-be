@@ -3,14 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const prisma_1 = __importDefault(require("../prisma"));
+// import prisma from "../../prisma";
 const bcrypt_1 = require("bcrypt");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const handlebars_1 = __importDefault(require("handlebars"));
 const mailer_1 = require("../helpers/mailer");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const isDebug = process.env.DEBUG === "true";
+const prisma_1 = __importDefault(require("../prisma"));
+const isDebug = process.env.DEBUG === "false";
 function logDebug(message, ...optionalParams) {
     if (isDebug) {
         console.log("[DEBUG]", message, ...optionalParams);
@@ -79,19 +80,47 @@ class AuthController {
             res.status(500).send({ message: "Internal server error", error: err });
         }
     }
+    async verify(req, res) {
+        console.log("TOKEN VERIFICATION");
+        try {
+            const { id } = res.locals?.user;
+            const token = res.locals?.token;
+            const data = await prisma_1.default.email_verifications.findFirst({
+                where: { token, userId: id },
+            });
+            if (!data)
+                throw { message: "Invalid link verification " };
+            await prisma_1.default.user.update({
+                data: { isVerified: true },
+                where: { id },
+            });
+            await prisma_1.default.email_verifications.delete({
+                where: { id: data.id }
+            });
+            res.status(200).send({ message: "Verification Successfully" });
+        }
+        catch (err) {
+            console.log(err);
+            res.status(400).send(err);
+        }
+    }
 }
 exports.default = AuthController;
 /*
 
-curl http://localhost:8000/api
+curl -X GET http://localhost:8000/api
 
 curl -X POST http://localhost:8000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "dianck",
-    "email": "cafofy@forexzig.com",
+    "username": "budi",
+    "email": "hapegyjo@forexnews.bg",
     "password": "asd123"
   }'
 
 
+curl -X PATCH http://localhost:8000/api/auth/verify
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDgsImlhdCI6MTc1MTQ0MDE4NiwiZXhwIjoxNzUxNDQwNzg2fQ.J3O8jzo0p8oCp_zDEFcUj6OuU1zPuxHMD8pj7cKerKA"
+  
+  
 */ 
