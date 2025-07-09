@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 // import prisma from "../../prisma";
-import { genSalt, hash } from "bcrypt";
+import { compare, genSalt, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import Handlebars from "handlebars";
 import { transporter } from "../helpers/mailer";
@@ -132,6 +132,67 @@ export default class AuthController{
     }
   }
 
+
+
+  async login(req: Request, res: Response) {
+    try {
+      const { login, password } = req.body;
+
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { username: login },
+            { email: login }
+          ]
+        },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          password: true,
+          avatar: true,
+          isVerified: true,
+          // Jangan ambil points langsung (array), akan kita jumlahkan terpisah
+        }
+      });
+
+      if (!user) {
+        res.status(404).send({ message: "User not found" });
+        return;
+      }
+
+      const isPasswordValid = await compare(password, user.password);
+      if (!isPasswordValid) {
+        res.status(401).send({ message: "Invalid password" });
+        return;
+      }
+
+      if (!user.isVerified) {
+        res.status(402).send({ message: "Account not verified, please check your confirmation email!" });
+        return;
+      }
+
+      const payload = { id: user.id };
+      const token = sign(payload, process.env.SECRET_KEY!, { expiresIn: "1h" });
+
+      const { password: _, ...userWithoutPassword } = user;
+
+      res.status(200).send({
+        message: "Login OK",
+        user: {
+          ...userWithoutPassword,
+        },
+        token
+      });
+
+    } catch (err) {
+      console.error("Query error:", err);
+      res.status(500).send({ message: "Internal error", error: err });
+    }
+  }
+
+
+
 }
 
 /*
@@ -147,8 +208,7 @@ curl -X POST http://localhost:8000/api/auth/register \
   }'
 
 
-curl -X PATCH http://localhost:8000/api/auth/verify   
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDgsImlhdCI6MTc1MTQ0MDE4NiwiZXhwIjoxNzUxNDQwNzg2fQ.J3O8jzo0p8oCp_zDEFcUj6OuU1zPuxHMD8pj7cKerKA"
-  
+curl -X PATCH http://localhost:8000/api/auth/verify \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTEsImlhdCI6MTc1MTQ0MTgwOCwiZXhwIjoxNzUxNDQyNDA4fQ.dWvOCUTZtrdtbY910Gw6817oBTw6TuqL17CiVIBBM7c"  
   
 */

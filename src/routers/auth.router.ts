@@ -21,7 +21,8 @@ export default class AuthRouter{
             "/verify", 
             verifyTokenVerification, 
         this.authController.verify);
-        
+        this.router.post("/login", this.authController.login);
+          
         
     }
 
