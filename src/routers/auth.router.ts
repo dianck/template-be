@@ -22,7 +22,16 @@ export default class AuthRouter{
             verifyTokenVerification, 
         this.authController.verify);
         this.router.post("/login", this.authController.login);
-          
+        this.router.post("/email-conf-pwd", this.authController.emailConfirmPasswordReset);
+
+        this.router.patch(
+            "/verify-reset-pwd", 
+            verifyTokenVerification, 
+        this.authController.verifyResetPassword);
+
+        // this.router.post("/reset-pwd", this.authController.resetPassword.bind(this.authController));        
+        this.router.post("/reset-pwd", this.authController.resetPassword);
+        
         
     }
 

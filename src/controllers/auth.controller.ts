@@ -168,7 +168,7 @@ export default class AuthController{
       }
 
       if (!user.isVerified) {
-        res.status(402).send({ message: "Account not verified, please check your confirmation email!" });
+        res.status(402).send({ message: "Account not verified, please check your email verification!" });
         return;
       }
 
@@ -191,6 +191,180 @@ export default class AuthController{
     }
   }
 
+
+  async emailConfirmPasswordReset(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      console.log("req.body: ", req.body);
+
+      const user = await prisma.user.findFirst({
+        where: {
+            email: email 
+        },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          password: true,
+          avatar: true,
+          isVerified: true,
+          // Jangan ambil points langsung (array), akan kita jumlahkan terpisah
+        }
+      });     
+      
+      if (!user) {
+        res.status(404).send({ message: "Email has not been registerred" });
+        return;
+      }      
+
+      if (!user.isVerified) {
+        res.status(402).send({ message: "Account not verified, please check your email verification!" });
+        return;
+      }
+
+        //token untuk verifikasi
+        const payload = { id: user.id };
+        const token = sign(payload, process.env.SECRET_KEY_VERIFY!, { expiresIn: "10m" });
+
+        logDebug("TOKEN Generated OK...");
+    
+        const expiredAt = new Date (Date.now() + 10 * 60 * 1000)
+        await prisma.email_verifications.create({
+            data: {userId: user.id, token, expiredAt},
+        });
+
+
+        logDebug("Email VErification insertion OK...");
+
+
+        const templatePath = path.join(__dirname, "../templates", "reset.hbs");
+        if (!fs.existsSync(templatePath)) {
+          res.status(500).send({ message: "Email template not found" });
+          return;
+        }
+    
+        logDebug("Email TEMPLATE PATH OK...");
+        
+
+        const templateSource = fs.readFileSync(templatePath, "utf-8");
+        const compiledTemplate = Handlebars.compile(templateSource);
+        const html = compiledTemplate({
+          username: user.username,
+          brand: process.env.BRAND,
+          link: `${process.env.EMAIL_VERIFICATION_URL}/reset-pwd?token=${token}`
+        });
+        logDebug("Email Html Template OK...");
+
+        await  transporter.sendMail({
+          from: process.env.GMAIL_USER,
+          to: user.email,
+          subject: "Reset Password",
+          html,
+        });
+        logDebug("Email Reset Password SENT OK...");
+    
+        res.status(201).send({ message: "Check your email" });
+
+    } catch (err) {
+      console.error("Psssword Reset request error:", err);
+      res.status(500).send({ message: "Internal error", error: err });
+    }
+  } 
+
+
+  async verifyResetPassword(req: Request, res: Response){
+    console.log("TOKEN VERIFICATION");
+    try{
+      const { id } = res.locals?.user;
+      const token  = res.locals?.token;
+
+      const data = await prisma.email_verifications.findFirst({
+        where: {token, userId: id},
+      })
+
+      if (!data) {
+        res.status(404).send({ message: "Invalid link verification" });
+        return;
+      } 
+
+      if(!data) throw {message: "Invalid link verification "};
+
+      await prisma.email_verifications.delete({
+        where: {id: data.id}
+      });
+
+      const user = await prisma.user.findFirst({
+        where: {
+            id: id 
+        },
+        select: {
+          id: true,
+          email: true,
+          // Jangan ambil points langsung (array), akan kita jumlahkan terpisah
+        }
+      });
+
+
+      res.status(200).send({
+        message: "Link verified, let continue to reset your password",
+        user: user
+      });      
+
+    }catch(err){
+      console.log(err);
+      res.status(400).send(err);
+    }
+  }
+
+
+   async resetPassword(req: Request, res: Response) {
+      try {
+
+        logDebug("BODY", req.body);
+        const { email, password} = req.body;
+
+        if (!email || !password ) {
+          res.status(400).send({ message: "All fields are required" });
+          return; 
+        }
+
+        logDebug("FIELD CHECK OK...");
+        const user = await prisma.user.findFirst({
+          where: {
+              email: email 
+          },
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            password: true,
+            avatar: true,
+            isVerified: true,
+            // Jangan ambil points langsung (array), akan kita jumlahkan terpisah
+          }
+        });          
+
+        
+        // 🔐 Hash the new password
+        const salt = await genSalt(10);
+        const hashedPassword = await hash(password, salt);
+
+        // 📝 Update password in database
+        await prisma.user.update({
+          where: { email: email },
+          data: {
+            password: hashedPassword,
+          },
+        });
+
+    
+        res.status(201).send({ message: "Password reset success..." });
+      } catch (err) {
+        console.error("Register error:", err);
+        res.status(500).send({ message: "Internal server error", error: err });
+      }
+  }
+ 
 
 
 }
